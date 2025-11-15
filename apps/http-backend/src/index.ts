@@ -2,13 +2,13 @@ import express from "express";
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "@repo/backend-common/config";
 import { middleware } from "./middleware";
-import {CreateUserSchema} from "@repo/common/types";
+import { CreateUserSchema, SignInSchema, CreateRoomSchema } from "@repo/common/types";
 
  const app = express();
 
  app.post("/signup", (req, res) => {
   //dbb call
-  const data = CreateUserSchema.safeparse(req.body);
+  const data = CreateUserSchema.safeParse(req.body);
  if(!data.success){
     return res.status(400).json({message: "Invalid data"});
  }
@@ -20,6 +20,7 @@ import {CreateUserSchema} from "@repo/common/types";
  });
 
 app.post("/signin", (req, res) => {
+
   const userId = 1;
   try {
     const token = jwt.sign({ userId }, JWT_SECRET);
@@ -31,7 +32,13 @@ app.post("/signin", (req, res) => {
 
 
  app.post("/room",middleware,  (req, res) => {
-  //db calll
+  const data = CreateRoomSchema.safeParse(req.body);
+  if(!data.success) {
+    res.json({
+      message: "Incorrect inputs"
+    })
+    return;
+  }
   res.json ({
     roomId: 1,
     name: "Conference Room",
